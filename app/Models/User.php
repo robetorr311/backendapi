@@ -18,6 +18,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      *
      * @var string[]
      */
+    public $table = "comun.users";
     protected $fillable = [
         'nombre','login','email','telefono','token','codigo','estatus','email_verified','telefono_verified'
     ];

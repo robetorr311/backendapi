@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 use Laravel\Lumen\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Configuracion;
 use App\Models\Estado;
 use App\Models\Municipio;
 use App\Models\Parroquia;
+use App\Models\Permiso;
 use App\Models\Localidad;
 use App\Models\Perfil;
 use App\Models\Estatus;
+use App\Models\Tipoestatus;
 use App\Models\Sistema;
 use App\Models\Menu;
 use App\Models\User;
@@ -24,7 +27,350 @@ class ComunController extends BaseController
     {
         //
     }
+    public function indexUsuario(){
+        try
+        {
+            $usuarios = User::all();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Usuarios'
+                ]
+            ], 500);
+        }
 
+        if($usuarios)
+        {
+            $data = [];
+            foreach($usuarios as $usuario)
+            {
+                $types = [];
+                $types = [
+                    'id' => $usuario->id,
+                    'nombre' => $usuario->nombre,
+                    'login' => $usuario->login,
+                    'email' => $usuario->email,
+                    'telefono' => $usuario->telefono,
+                    'estatus' => $usuario->estatus,
+                    'email_verified' => $usuario->email_verified,
+                    'telefono_verified' => $usuario->telefono_verified
+                ];
+                $data[] = $types;
+            }
+        }
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Usuarios was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function showUsuario($id){
+        try
+        {
+            $user = User::where('id', $id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Usuarios'
+                ]
+            ], 500);
+        }
+        if($user)
+        {
+            $data = [];
+            $data = [
+                'nombre' => $user->nombre,
+                'login' => $user->login,
+                'email' => $user->email,
+                'telefono' => $user->telefono,
+                'estatus' => $user->estatus,
+                'email_verified' => $user->email_verified,
+                'telefono_verified' => $user->telefono_verified
+            ];
+        }
+        if(!empty($data))
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Usuario was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function storeUsuario(Request $request){
+        $data = new User();
+        if($request->input('nombre')){ 
+            $data->nombre = $request->input('nombre');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre'
+                ]
+            ], 422);
+        }
+        if($request->input('login')){ 
+            $data->login= $request->input('login');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'login'
+                ]
+            ], 422);
+        }
+        if($request->input('clave')){ 
+            $data->clave= Hash::make($request->input('clave'));
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'password'
+                ]
+            ], 422);
+        }
+        if($request->input('email')){ 
+            $data->email = $request->input('email');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Email es Requerido'
+                ]
+            ], 422);
+        }
+        if($request->input('telefono')){ 
+            $data->telefono = $request->input('telefono');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Telefono no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('estatus')){ 
+            $data->estatus = $request->input('estatus');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'estatus es Requerido no puede estar vacio'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error storing Usuarios'
+                ]
+            ], 500);
+        }
+    }
+
+    public function updateUsuario($id, Request $request){
+        try
+        {
+            $data = User::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Usuarios'
+                ]
+            ], 500);
+        }
+        if($request->input('nombre')){ 
+            $data->nombre = $request->input('nombre');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre'
+                ]
+            ], 422);
+        }
+        if($request->input('login')){ 
+            $data->login= $request->input('login');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'login'
+                ]
+            ], 422);
+        }
+        if($request->input('email')){ 
+            $data->email = $request->input('email');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Email es Requerido'
+                ]
+            ], 422);
+        }
+        if($request->input('telefono')){ 
+            $data->telefono = $request->input('telefono');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Telefono no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('estatus')){ 
+            $data->estatus = $request->input('estatus');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'estatus es Requerido no puede estar vacio'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error updating Usuarios'
+                ]
+            ], 500);
+        }
+    }
+
+    public function destroyUsuario($id){
+        try
+        {
+            $data = User::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Usuario'
+                ]
+            ], 500);
+        }
+        try 
+        {
+            $data->delete();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error deleting Usuario'
+                ]
+            ], 500);
+        }
+    }
     public function indexEstado(){
         try
         {
@@ -126,7 +472,7 @@ class ComunController extends BaseController
     }
 
     public function storeEstado(Request $request){
-        $data = new Estado;
+        $data = new Estado();
 
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -160,7 +506,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updateEstado(Request $request, $id){
+    public function updateEstado($id, Request $request){
         try
         {
             $data = Estado::where('id',$id)->first();
@@ -177,7 +523,6 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
         }else{
@@ -349,7 +694,7 @@ class ComunController extends BaseController
     }
 
     public function storeMunicipio(Request $request){
-        $data = new Municipio;
+        $data = new Municipio();
 
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -394,7 +739,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updateMunicipio(Request $request, $id){
+    public function updateMunicipio($id, Request $request){
         try
         {
             $data = Municipio::where('id',$id)->first();
@@ -595,7 +940,7 @@ class ComunController extends BaseController
     }
 
     public function storeParroquia(Request $request){
-        $data = new Parroquia;
+        $data = new Parroquia();
 
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -652,7 +997,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updateParroquia(Request $request, $id){
+    public function updateParroquia($id, Request $request){
         try
         {
             $data = Parroquia::where('id',$id)->first();
@@ -867,7 +1212,7 @@ class ComunController extends BaseController
     }
 
     public function storeLocalidad(Request $request){
-        $data = new Localidad;
+        $data = new Localidad();
 
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -936,7 +1281,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updateLocalidad(Request $request, $id){
+    public function updateLocalidad($id, Request $request){
         try
         {
             $data = Localidad::where('id',$id)->first();
@@ -1157,7 +1502,7 @@ class ComunController extends BaseController
     }
 
     public function storeSistema(Request $request){
-        $data = new Sistema;
+        $data = new Sistema();
 
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -1191,7 +1536,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updateSistema(Request $request, $id){
+    public function updateSistema($id, Request $request){
         try
         {
             $data = Sistema::where('id',$id)->first();
@@ -1379,7 +1724,7 @@ class ComunController extends BaseController
     }
 
     public function storeEstatus(Request $request){
-        $data = new Estatus;
+        $data = new Estatus();
 
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -1394,7 +1739,7 @@ class ComunController extends BaseController
             ], 422);
         }
         if($request->input('tipo_estatus')){
-            $data->tipo_estatus = $request->input('tipo_estatus');
+            $data->id_tipoestatus = $request->input('tipo_estatus');
         }else{
             return response()->json([
                 'responseCode' => '422',
@@ -1424,7 +1769,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updateEstatus(Request $request, $id){
+    public function updateEstatus($id, Request $request){
         try
         {
             $data = Estatus::where('id',$id)->first();
@@ -1455,7 +1800,7 @@ class ComunController extends BaseController
             ], 422);
         }
         if($request->input('tipo_estatus')){
-            $data->tipo_estatus = $request->input('tipo_estatus');
+            $data->id_tipoestatus = $request->input('tipo_estatus');
         }else{
             return response()->json([
                 'responseCode' => '422',
@@ -1632,9 +1977,10 @@ class ComunController extends BaseController
     }
 
     public function showPerfil($id){
+
         try
         {
-            $Perfil = Perfil::where('id', $id)->first();
+            $perfil = Perfil::where('id', $id)->first();
         }
         catch (Exception $e)
         {
@@ -1652,8 +1998,8 @@ class ComunController extends BaseController
         {
             $data = [];
             $data = [
-                'id' => $Perfil->id,
-                'nombre' => $Perfil->nombre
+                'id' => $perfil->id,
+                'nombre' => $perfil->nombre
             ];
             try
                 {
@@ -1719,7 +2065,7 @@ class ComunController extends BaseController
                 }
         }
 
-        if($data)
+        if(!empty($data))
         {
             return response()->json([
                 'responseCode' => 200,
@@ -1741,7 +2087,7 @@ class ComunController extends BaseController
     }
 
     public function storePerfil(Request $request){
-        $data = new Perfil;
+        $data = new Perfil();
         if($request->input('id_usuario')){ 
             $data->id_usuario = $request->input('id_usuario');
         }
@@ -1839,6 +2185,19 @@ class ComunController extends BaseController
                 'data' => [
                     'errorCode' => '001',
                     'error' => 'Cedula es Requerido no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('tipo_usuario')){ 
+            $data->id_tipousuario = $request->input('tipo_usuario');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Tipo de Usuario es Requerido no puede estar vacio'
                 ]
             ], 422);
         }
@@ -1861,7 +2220,7 @@ class ComunController extends BaseController
         }
     }
 
-    public function updatePerfil(Request $request, $id){
+    public function updatePerfil($id, Request $request){
         try
         {
             $data = Perfil::where('id',$id)->first();
@@ -1877,20 +2236,6 @@ class ComunController extends BaseController
                     'errorMessage' => 'Error getting Perfils'
                 ]
             ], 500);
-        }
-
-        if($request->input('id_usuario')){ 
-            $data->id_usuario = $request->input('id_usuario');
-        }
-        else{
-            return response()->json([
-                'responseCode' => '422',
-                'response' => 'Validation Error',
-                'data' => [
-                    'errorCode' => '001',
-                    'error' => 'Id usuario'
-                ]
-            ], 422);
         }
         if($request->input('direccion')){ 
             $data->direccion = $request->input('direccion');
@@ -1979,7 +2324,19 @@ class ComunController extends BaseController
                 ]
             ], 422);
         }
-
+        if($request->input('tipo_usuario')){ 
+            $data->id_tipousuario = $request->input('tipo_usuario');
+        }
+        else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Tipo de Usuario es Requerido no puede estar vacio'
+                ]
+            ], 422);
+        }
         try 
         {
             $data->save();
@@ -2034,4 +2391,762 @@ class ComunController extends BaseController
             ], 500);
         }
     }
+    public function indexTipoEstatus(){
+        try
+        {
+            $tipoestatuss = Tipoestatus::all();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Tipo Estatus'
+                ]
+            ], 500);
+        }
+
+        if($tipoestatuss)
+        {
+            $data = [];
+            foreach($tipoestatuss as $tipoestatus)
+            {
+                $types = [];
+                $types = [
+                    'id'            => $tipoestatus->id,
+                    'nombre'          => $tipoestatus->nombre
+                ];
+                $data[] = $types;
+            }
+        }
+
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Tipo Estatus was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function showTipoEstatus($id){
+        try
+        {
+            $tipoestatus = Tipoestatus::where('id', $id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Tipo Estatus'
+                ]
+            ], 500);
+        }
+        if($tipoestatus)
+        {
+            $data = [];
+            $data = [
+                'id' => $tipoestatus->id,
+                'nombre' => $tipoestatus->nombre,
+            ];
+        }
+
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Tipo Estatus was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function storeTipoEstatus(Request $request){
+        $data = new TipoEstatus();
+
+        if($request->input('nombre')){
+            $data->nombre = $request->input('nombre');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre no puede estar vacio'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error storing Tipo Estatuss'
+                ]
+            ], 500);
+        }
+    }
+
+    public function updateTipoEstatus($id, Request $request){
+        try
+        {
+            $data = Tipoestatus::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Tipo Estatus'
+                ]
+            ], 500);
+        }
+
+        if($request->input('nombre')){
+            $data->nombre = $request->input('nombre');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre no puede estar vacio'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error updating Tipo Estatus'
+                ]
+            ], 500);
+        }
+    }
+
+    public function destroyTipoEstatus($id){
+        try
+        {
+            $data = Tipoestatus::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Tipo Estatus'
+                ]
+            ], 500);
+        }
+        try 
+        {
+            $data->delete();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error deleting TipoEstatus'
+                ]
+            ], 500);
+        }
+    }
+    public function indexMenu(){
+        try
+        {
+            $menus = Menu::all();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Menu'
+                ]
+            ], 500);
+        }
+
+        if($menus)
+        {
+            $data = [];
+            foreach($menus as $menu)
+            {
+                $types = [];
+                $types = [
+                    'id'            => $menu->id,
+                    'nombre'          => $menu->nombre,
+                    'icono'          => $menu->icono,
+                    'id_sistema'          => $menu->id_sistema
+                ];
+                $data[] = $types;
+            }
+        }
+
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Menu was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function showMenu($id){
+        try
+        {
+            $menu = Menu::where('id', $id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Menu'
+                ]
+            ], 500);
+        }
+        if($menu)
+        {
+            $data = [];
+            $data = [
+                'id' => $menu->id,
+                'nombre' => $menu->nombre,
+                'icono' => $menu->icono,
+                'id_sistema' => $menu->id_sistema
+            ];
+        }
+
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Menu was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function storeMenu(Request $request){
+        $data = new Menu();
+
+        if($request->input('nombre')){
+            $data->nombre = $request->input('nombre');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('icono')){
+            $data->icono = $request->input('icono');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '002',
+                    'error' => 'Icono no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('id_sistema')){
+            $data->id_sistema = $request->input('id_sistema');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '002',
+                    'error' => 'Debe seleccionar el sistema'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error storing Menus'
+                ]
+            ], 500);
+        }
+    }
+
+    public function updateMenu($id, Request $request){
+        try
+        {
+            $data = Menu::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Menu'
+                ]
+            ], 500);
+        }
+
+        if($request->input('nombre')){
+            $data->nombre = $request->input('nombre');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('icono')){
+            $data->icono = $request->input('icono');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '002',
+                    'error' => 'Icono no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('id_sistema')){
+            $data->id_sistema = $request->input('id_sistema');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '002',
+                    'error' => 'Debe seleccionar el sistema'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error updating Menu'
+                ]
+            ], 500);
+        }
+    }
+
+    public function destroyMenu($id){
+        try
+        {
+            $data = Menu::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Menu'
+                ]
+            ], 500);
+        }
+        try 
+        {
+            $data->delete();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error deleting Menu'
+                ]
+            ], 500);
+        }
+    }
+    public function indexPermisos(){
+        try
+        {
+            $permisoss = Permiso::all();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Permisos'
+                ]
+            ], 500);
+        }
+
+        if($permisoss)
+        {
+            $data = [];
+            foreach($permisoss as $permisos)
+            {
+                $types = [];
+                $types = [
+                    'id' => $permisos->id,
+                    'id_menu' => $permisos->id_menu,
+                    'id_usuario' => $permisos->id_usuario,
+                    'id_sistema' => $permisos->id_sistema
+                ];
+                $data[] = $types;
+            }
+        }
+
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Permisos was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function showPermisos($id){
+        try
+        {
+            $permisos = Permiso::where('id', $id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Permisos'
+                ]
+            ], 500);
+        }
+        if($permisos)
+        {
+            $data = [];
+            $data = [
+                'id' => $permisos->id,
+                'id_menu' => $permisos->id_menu,
+                'id_usuario' => $permisos->id_usuario,
+                'id_sistema' => $permisos->id_sistema
+            ];
+        }
+
+        if($data)
+        {
+            return response()->json([
+                'responseCode' => 200,
+                'response' => 'OK',
+                'data' => $data
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Permisos was not found'
+                ]
+            ], 404);
+        }
+    }
+
+    public function storePermisos(Request $request){
+        $data = new Permiso();
+
+        if($request->input('id_menu')){
+            $data->id_menu = $request->input('id_menu');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Debe seleccionar el menu'
+                ]
+            ], 422);
+        }
+        if($request->input('id_usuario')){
+            $data->id_usuario = $request->input('id_usuario');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '002',
+                    'error' => 'Debe seleccionar el usuario'
+                ]
+            ], 422);
+        }
+        if($request->input('id_sistema')){
+            $data->id_sistema = $request->input('id_sistema');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '003',
+                    'error' => 'Debe seleccionar el sistema'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error storing Permisoss'
+                ]
+            ], 500);
+        }
+    }
+
+    public function updatePermisos($id, Request $request){
+        try
+        {
+            $data = Permiso::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Permisos'
+                ]
+            ], 500);
+        }
+
+        if($request->input('id_menu')){
+            $data->id_menu = $request->input('id_menu');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Debe seleccionar el menu'
+                ]
+            ], 422);
+        }
+        if($request->input('id_usuario')){
+            $data->id_usuario = $request->input('id_usuario');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '002',
+                    'error' => 'Debe seleccionar el usuario'
+                ]
+            ], 422);
+        }
+        if($request->input('id_sistema')){
+            $data->id_sistema = $request->input('id_sistema');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '003',
+                    'error' => 'Debe seleccionar el sistema'
+                ]
+            ], 422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error updating Permisos'
+                ]
+            ], 500);
+        }
+    }
+
+    public function destroyPermisos($id){
+        try
+        {
+            $data = Permiso::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Permisos'
+                ]
+            ], 500);
+        }
+        try 
+        {
+            $data->delete();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error deleting Permisos'
+                ]
+            ], 500);
+        }
+    }    
 }

@@ -10,6 +10,6 @@ class Entrada extends Model
     // use HasFactory;
 
     public $table = "inventario.entrada";
-    protected $fillable = 'nroorden','factura','id_articulo','precio_unitario','precio_venta','cantidad','unidades','id_presentacion','fecha'];
+    protected $fillable = ['nroorden','factura','id_articulo','precio_unitario','precio_venta','cantidad','unidades','id_presentacion','fecha'];
             
 }

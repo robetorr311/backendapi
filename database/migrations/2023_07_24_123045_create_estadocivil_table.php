@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('inventario.movimiento', function (Blueprint $table) {
-            $table->bigInteger('id_entrada')->nullable()->change();
-            $table->bigInteger('id_salida')->nullable()->change();
+        Schema::create('comun.estadocivil', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->text('nombre');
+            $table->timestamps();
         });
     }
 
@@ -22,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('inventario.movimiento', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('comun.estadocivil');
     }
 };

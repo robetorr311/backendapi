@@ -23,9 +23,11 @@ use App\Models\Turno;
 use App\Models\Alimento;
 use App\Models\Pais;
 use App\Models\Laboratorio;
+use App\Models\Configuracion;
 use App\Models\User;
 class ConsultorioController extends BaseController
 {
+    private $token;
     /**
      * Create a new controller instance.
      *
@@ -33,7 +35,25 @@ class ConsultorioController extends BaseController
      */
     public function __construct()
     {
-        //
+        try
+        {
+            $configuracion = Configuracion::where('variable', 'token')->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Configuracion'
+                ]
+            ], 500);
+        }
+        if(!empty($configuracion)){
+            $this->token=$configuracion->valor;
+        }
     }
 
     public function indexServicio(){

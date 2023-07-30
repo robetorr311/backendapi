@@ -18,6 +18,7 @@ use App\Models\Menu;
 use App\Models\User;
 class ComunController extends BaseController
 {
+    private $token;
     /**
      * Create a new controller instance.
      *
@@ -25,7 +26,25 @@ class ComunController extends BaseController
      */
     public function __construct()
     {
-        //
+        try
+        {
+            $configuracion = Configuracion::where('variable', 'token')->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Configuracion'
+                ]
+            ], 500);
+        }
+        if(!empty($configuracion)){
+            $this->token=$configuracion->valor;
+        }
     }
     public function indexUsuario(){
         try
@@ -84,7 +103,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showUsuario($id){
         try
         {
@@ -135,7 +153,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeUsuario(Request $request){
         $data = new User();
         if($request->input('nombre')){ 
@@ -234,7 +251,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateUsuario($id, Request $request){
         try
         {
@@ -335,7 +351,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyUsuario($id){
         try
         {
@@ -423,7 +438,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showEstado($id){
         try
         {
@@ -470,7 +484,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeEstado(Request $request){
         $data = new Estado();
 
@@ -505,7 +518,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateEstado($id, Request $request){
         try
         {
@@ -554,7 +566,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyEstado($id){
         try
         {
@@ -589,7 +600,6 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-
     }
     public function indexMunicipio(){
         try
@@ -644,7 +654,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showMunicipio($id){
         try
         {
@@ -692,7 +701,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeMunicipio(Request $request){
         $data = new Municipio();
 
@@ -738,7 +746,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateMunicipio($id, Request $request){
         try
         {
@@ -799,7 +806,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyMunicipio($id){
         try
         {
@@ -889,7 +895,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showParroquia($id){
         try
         {
@@ -938,7 +943,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeParroquia(Request $request){
         $data = new Parroquia();
 
@@ -996,7 +1000,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateParroquia($id, Request $request){
         try
         {
@@ -1069,7 +1072,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyParroquia($id){
         try
         {
@@ -1160,7 +1162,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showLocalidad($id){
         try
         {
@@ -1210,7 +1211,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeLocalidad(Request $request){
         $data = new Localidad();
 
@@ -1280,7 +1280,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateLocalidad($id, Request $request){
         try
         {
@@ -1365,7 +1364,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyLocalidad($id){
         try
         {
@@ -1418,7 +1416,6 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-
         if($sistemas)
         {
             $data = [];
@@ -1431,15 +1428,7 @@ class ComunController extends BaseController
                 ];
                 $data[] = $types;
             }
-        }
-
-        if($data)
-        {
-            return response()->json([
-                'responseCode' => 200,
-                'response' => 'OK',
-                'data' => $data
-            ], 200);
+            return response()->json(['responseCode' => 200, 'response' => 'OK','data' => $data], 200);
         }
         else
         {
@@ -1453,7 +1442,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showSistema($id){
         try
         {
@@ -1478,15 +1466,7 @@ class ComunController extends BaseController
                 'id' => $Sistema->id,
                 'nombre' => $Sistema->nombre
             ];
-        }
-
-        if($data)
-        {
-            return response()->json([
-                'responseCode' => 200,
-                'response' => 'OK',
-                'data' => $data
-            ], 200);
+            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
         }
         else
         {
@@ -1500,7 +1480,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeSistema(Request $request){
         $data = new Sistema();
 
@@ -1535,7 +1514,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateSistema($id, Request $request){
         try
         {
@@ -1585,7 +1563,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroySistema($id){
         try
         {
@@ -1638,7 +1615,6 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-
         if($estatuss)
         {
             $data = [];
@@ -1652,15 +1628,7 @@ class ComunController extends BaseController
                 ];
                 $data[] = $types;
             }
-        }
-
-        if($data)
-        {
-            return response()->json([
-                'responseCode' => 200,
-                'response' => 'OK',
-                'data' => $data
-            ], 200);
+            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
         }
         else
         {
@@ -1674,7 +1642,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showEstatus($id){
         try
         {
@@ -1700,15 +1667,7 @@ class ComunController extends BaseController
                 'nombre' => $estatus->nombre,
                 'tipo_estatus' => $estatus->tipo_estatus
             ];
-        }
-
-        if($data)
-        {
-            return response()->json([
-                'responseCode' => 200,
-                'response' => 'OK',
-                'data' => $data
-            ], 200);
+            return response()->json(['responseCode' => 200,'response' => 'OK', 'data' => $data], 200);
         }
         else
         {
@@ -1722,7 +1681,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeEstatus(Request $request){
         $data = new Estatus();
 
@@ -1768,7 +1726,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateEstatus($id, Request $request){
         try
         {
@@ -1829,7 +1786,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyEstatus($id){
         try
         {
@@ -1868,7 +1824,28 @@ class ComunController extends BaseController
     public function indexPerfil(){
         try
         {
-            $perfiles = Perfil::all();
+            $perfiles = Perfil::select(
+             'perfil.id as id_perfil',
+             'perfil.id_usuario as id_usuario',
+             'perfil.direccion as direccion',
+             'perfil.id_estado as id_estado',
+             'perfil.id_municipio as id_municipio',
+             'perfil.id_parroquia as id_parroquia',
+             'perfil.id_localidad as id_localidad',
+             'perfil.twitter as twitter',
+             'perfil.instagram as instagram',
+             'perfil.facebook as facebook',
+             'perfil.cedula as cedula',
+             'perfil.id_tipousuario as id_tipousuario',
+             'users.nombre as nombre',
+             'users.login as login',
+             'users.email as email',
+             'users.telefono as telefono',
+             'estado.nombre as estado',
+             'municipio.nombre as municipio',
+             'parroquia.nombre as parroquia',
+             'localidad.nombre as localidad'  
+            )->join('comun.users', 'users.id', '=', 'perfil.id_usuario')->join('comun.estado', 'estado.id', '=', 'perfil.id_estado')->join('comun.municipio', 'municipio.id', '=', 'perfil.id_municipio')->join('comun.parroquia', 'parroquia.id', '=', 'perfil.id_parroquia')->join('comun.localidad', 'localidad.id', '=', 'perfil.id_localidad')->get();
         }
         catch (Exception $e)
         {
@@ -1882,86 +1859,37 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-
         if($perfiles)
         {
             $data = [];
             foreach($perfiles as $perfil)
             {
-                try
-                {
-                   $user = User::where('id',$perfil->id_usuario)->first();
-                }
-                catch (Exception $e)
-                {
-                    return response()->json([
-                        'responseCode' => '500',
-                        'response' => 'Internal Server Error',
-                        'data' => [
-                            'errorCode' => 'Error-1',
-                            //"exception" => $e->getMessage(),
-                            'errorMessage' => 'Error getting Perfils'
-                        ]
-                    ], 500);
-                }
-                if(!empty($user)){
-                    $types = [];
-                    $types = [
-                        'id' => $perfil->id,
-                        'id_usuario' => $perfil->id_usuario,
-                        'direccion' => $perfil->direccion,
-                        'id_estado' => $perfil->id_estado,
-                        'id_municipio' => $perfil->id_municipio,
-                        'id_parroquia' => $perfil->id_parroquia,
-                        'id_localidad' => $perfil->id_localidad,
-                        'twitter' => $perfil->twitter,
-                        'instagram' => $perfil->instagram,
-                        'facebook' => $perfil->facebook,
-                        'cedula' => $perfil->cedula,
-                        'id_tipousuario'  => $perfil->id_tipousuario,
-                        'nombre' => $user->nombre,
-                        'login' => $user->login,
-                        'email' => $user->email,
-                        'telefono' => $user->telefono,
-                        'estatus' => $user->estatus,
-                        'email_verified' => $user->email_verified,
-                        'telefono_verified' => $user->telefono_verified,
-                    ];
-                }
-                else{
-                    $types = [];
-                    $types = [
-                      'id' => $perfil->id,
-                      'id_usuario' => $perfil->id_usuario,
-                      'direccion' => $perfil->direccion,
-                      'id_estado' => $perfil->id_estado,
-                      'id_municipio' => $perfil->id_municipio,
-                      'id_parroquia' => $perfil->id_parroquia,
-                      'id_localidad' => $perfil->id_localidad,
-                      'twitter' => $perfil->twitter,
-                      'instagram' => $perfil->instagram,
-                      'facebook' => $perfil->facebook,
-                      'cedula' => $perfil->cedula,
-                      'id_tipousuario'  => $perfil->id_tipousuario,
-                      'nombre' => '',
-                      'login' => '',
-                      'email' => '',
-                      'telefono' => '',
-                      'estatus' => '',
-                      'email_verified' => '',
-                      'telefono_verified' => '',
-                    ];
-                }
-                $data[] = $types;
+                $types = [];
+                $types = [
+                    'id'  => $perfil->id_perfil,
+                    'id_usuario'  => $perfil->id_usuario,
+                    'direccion'  => $perfil->direccion,
+                    'id_estado'  => $perfil->id_estado,
+                    'id_municipio'  => $perfil->id_municipio,
+                    'id_parroquia'  => $perfil->id_parroquia,
+                    'id_localidad'  => $perfil->id_localidad,
+                    'twitter'  => $perfil->twitter,
+                    'instagram'  => $perfil->instagram,
+                    'facebook'  => $perfil->facebook,
+                    'cedula'  => $perfil->cedula,
+                    'id_tipousuario'  => $perfil->id_tipousuario,
+                    'nombre'  => $perfil->nombre,
+                    'login'  => $perfil->login,
+                    'email'  => $perfil->email,
+                    'telefono' => $perfil->telefono,
+                    'estado'  => $perfil->estado,
+                    'municipio'  => $perfil->municipio,
+                    'parroquia'  => $perfil->parroquia,
+                    'localidad'  => $perfil->localidad
+                ];
+                $data[] = $types;    
             }
-        }
-        if($data)
-        {
-            return response()->json([
-                'responseCode' => 200,
-                'response' => 'OK',
-                'data' => $data
-            ], 200);
+            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
         }
         else
         {
@@ -1975,12 +1903,32 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showPerfil($id){
 
         try
         {
-            $perfil = Perfil::where('id', $id)->first();
+            $perfiles = Perfil::select(
+             'perfil.id as id_perfil',
+             'perfil.id_usuario as id_usuario',
+             'perfil.direccion as direccion',
+             'perfil.id_estado as id_estado',
+             'perfil.id_municipio as id_municipio',
+             'perfil.id_parroquia as id_parroquia',
+             'perfil.id_localidad as id_localidad',
+             'perfil.twitter as twitter',
+             'perfil.instagram as instagram',
+             'perfil.facebook as facebook',
+             'perfil.cedula as cedula',
+             'perfil.id_tipousuario as id_tipousuario',
+             'users.nombre as nombre',
+             'users.login as login',
+             'users.email as email',
+             'users.telefono as telefono',
+             'estado.nombre as estado',
+             'municipio.nombre as municipio',
+             'parroquia.nombre as parroquia',
+             'localidad.nombre as localidad'  
+            )->join('comun.users', 'users.id', '=', 'perfil.id_usuario')->join('comun.estado', 'estado.id', '=', 'perfil.id_estado')->join('comun.municipio', 'municipio.id', '=', 'perfil.id_municipio')->join('comun.parroquia', 'parroquia.id', '=', 'perfil.id_parroquia')->join('comun.localidad', 'localidad.id', '=', 'perfil.id_localidad')->where('perfil.id', $id)->first();
         }
         catch (Exception $e)
         {
@@ -1994,77 +1942,32 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-        if($perfil)
+        if(!empty($perfiles))
         {
             $data = [];
             $data = [
-                'id' => $perfil->id,
-                'nombre' => $perfil->nombre
+                'id' => $perfiles->id_perfil,
+                'id_usuario'  => $perfiles->id_usuario,
+                'direccion'  => $perfiles->direccion,
+                'id_estado'  => $perfiles->id_estado,
+                'id_municipio'  => $perfiles->id_municipio,
+                'id_parroquia'  => $perfiles->id_parroquia,
+                'id_localidad'  => $perfiles->id_localidad,
+                'twitter'  => $perfiles->twitter,
+                'instagram'  => $perfiles->instagram,
+                'facebook'  => $perfiles->facebook,
+                'cedula'  => $perfiles->cedula,
+                'id_tipousuario'  => $perfiles->id_tipousuario,
+                'nombre'  => $perfiles->nombre,
+                'login'  => $perfiles->login,
+                'email'  => $perfiles->email,
+                'telefono' => $perfiles->telefono,
+                'estado'  => $perfiles->estado,
+                'municipio'  => $perfiles->municipio,
+                'parroquia'  => $perfiles->parroquia,
+                'localidad'  => $perfiles->localidad,
             ];
-            try
-                {
-                   $user = User::where('id',$perfil->id_usuario)->first();
-                }
-                catch (Exception $e)
-                {
-                    return response()->json([
-                        'responseCode' => '500',
-                        'response' => 'Internal Server Error',
-                        'data' => [
-                            'errorCode' => 'Error-1',
-                            //"exception" => $e->getMessage(),
-                            'errorMessage' => 'Error getting Perfils'
-                        ]
-                    ], 500);
-                }
-                if(!empty($user)){
-                    $data = [
-                        'id' => $perfil->id,
-                        'id_usuario' => $perfil->id_usuario,
-                        'direccion' => $perfil->direccion,
-                        'id_estado' => $perfil->id_estado,
-                        'id_municipio' => $perfil->id_municipio,
-                        'id_parroquia' => $perfil->id_parroquia,
-                        'id_localidad' => $perfil->id_localidad,
-                        'twitter' => $perfil->twitter,
-                        'instagram' => $perfil->instagram,
-                        'facebook' => $perfil->facebook,
-                        'cedula' => $perfil->cedula,
-                        'id_tipousuario'  => $perfil->id_tipousuario,
-                        'nombre' => $user->nombre,
-                        'login' => $user->login,
-                        'email' => $user->email,
-                        'telefono' => $user->telefono,
-                        'estatus' => $user->estatus,
-                        'email_verified' => $user->email_verified,
-                        'telefono_verified' => $user->telefono_verified,
-                    ];
-                }
-                else{
-                    $data = [
-                      'id' => $perfil->id,
-                      'id_usuario' => $perfil->id_usuario,
-                      'direccion' => $perfil->direccion,
-                      'id_estado' => $perfil->id_estado,
-                      'id_municipio' => $perfil->id_municipio,
-                      'id_parroquia' => $perfil->id_parroquia,
-                      'id_localidad' => $perfil->id_localidad,
-                      'twitter' => $perfil->twitter,
-                      'instagram' => $perfil->instagram,
-                      'facebook' => $perfil->facebook,
-                      'cedula' => $perfil->cedula,
-                      'id_tipousuario'  => $perfil->id_tipousuario,
-                      'nombre' => '',
-                      'login' => '',
-                      'email' => '',
-                      'telefono' => '',
-                      'estatus' => '',
-                      'email_verified' => '',
-                      'telefono_verified' => '',
-                    ];
-                }
         }
-
         if(!empty($data))
         {
             return response()->json([
@@ -2085,7 +1988,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storePerfil(Request $request){
         $data = new Perfil();
         if($request->input('id_usuario')){ 
@@ -2219,7 +2121,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updatePerfil($id, Request $request){
         try
         {
@@ -2355,7 +2256,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyPerfil($id){
         try
         {
@@ -2443,7 +2343,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showTipoEstatus($id){
         try
         {
@@ -2490,7 +2389,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeTipoEstatus(Request $request){
         $data = new TipoEstatus();
 
@@ -2524,7 +2422,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateTipoEstatus($id, Request $request){
         try
         {
@@ -2573,7 +2470,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyTipoEstatus($id){
         try
         {
@@ -2663,7 +2559,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showMenu($id){
         try
         {
@@ -2712,7 +2607,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storeMenu(Request $request){
         $data = new Menu();
 
@@ -2770,7 +2664,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updateMenu($id, Request $request){
         try
         {
@@ -2843,7 +2736,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyMenu($id){
         try
         {
@@ -2933,7 +2825,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function showPermisos($id){
         try
         {
@@ -2982,7 +2873,6 @@ class ComunController extends BaseController
             ], 404);
         }
     }
-
     public function storePermisos(Request $request){
         $data = new Permiso();
 
@@ -3040,7 +2930,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function updatePermisos($id, Request $request){
         try
         {
@@ -3113,7 +3002,6 @@ class ComunController extends BaseController
             ], 500);
         }
     }
-
     public function destroyPermisos($id){
         try
         {
@@ -3148,5 +3036,5 @@ class ComunController extends BaseController
                 ]
             ], 500);
         }
-    }    
+    }
 }

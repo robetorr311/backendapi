@@ -45,7 +45,6 @@ return new class extends Migration
             $table->text('PROTEINA_C_REACTIVA')->nullable();
             $table->text('PROTEINAS_TOTAL_FRACCION')->nullable();
             $table->text('RA_TEST')->nullable();
-            $table->text('ORINA')->nullable();
             $table->text('REL_CALCIO_CREATININA_EN')->nullable();
             $table->text('RETICULOCITOS')->nullable();
             $table->text('SANGRE_OCULTA_EN_HECES')->nullable();

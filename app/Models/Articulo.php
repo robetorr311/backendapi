@@ -10,6 +10,6 @@ class Articulo extends Model
     // use HasFactory;
 
     public $table = "inventario.articulo";
-    protected $fillable = ['nombre','descripcion','precio_unitario','precio_venta','id_imagen','codigo','id_usuario'];
+    protected $fillable = ['nombre','descripcion','precio_unitario','precio_venta','id_imagen','codigo','id_categoria','id_usuario'];
             
 }

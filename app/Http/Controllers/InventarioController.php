@@ -12,9 +12,12 @@ use App\Models\Salida;
 use App\Models\Movimiento;
 use App\Models\Tipomovimiento;
 use App\Models\Presentacion;
+use App\Models\Categoria;
+use App\Models\Configuracion;
 use App\Models\User;
 class InventarioController extends BaseController
 {
+    private $token;
     /**
      * Create a new controller instance.
      *
@@ -22,12 +25,45 @@ class InventarioController extends BaseController
      */
     public function __construct()
     {
-        //
+        try
+        {
+            $configuracion = Configuracion::where('variable', 'token')->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Configuracion'
+                ]
+            ], 500);
+        }
+        if(!empty($configuracion)){
+            $this->token=$configuracion->valor;
+        }
     }
     public function indexArticulo(){
         try
         {
-            $Articulos = Articulo::all();
+            $Articulos = Articulo::select(
+            'articulo.id as id_articulo',
+            'articulo.nombre as nombre',
+            'articulo.descripcion as descripcion',
+            'articulo.precio_unitario as precio_unitario',
+            'articulo.precio_venta as precio_venta',
+            'articulo.id_imagen as id_imagen',
+            'articulo.codigo as codigo',
+            'articulo.id_usuario as id_usuario',
+            'imagenarticulo.nombre as imagen',
+            'imagenarticulo.url as url',
+            'imagenarticulo.alt as alt',
+            'categorias.id_categoria as id_categoria',
+            'categorias.nombre as categoria',
+            'categorias.parent as categoriapadre'
+            )->join('inventario.imagenarticulo', 'imagenarticulo.id', '=', 'articulo.id_imagen')->join('comun.categorias', 'categorias.id', '=', 'articulo.id_categoria')->get();
         }
         catch (Exception $e)
         {
@@ -48,14 +84,20 @@ class InventarioController extends BaseController
             {
                 $types = [];
                 $types = [
-                    'id' => $Articulo->id,
-                    'nombre' => $Articulo->nombre,
-                    'descripcion' => $Articulo->descripcion,
-                    'precio_unitario' => $Articulo->precio_unitario,
-                    'precio_venta' => $Articulo->precio_venta,
-                    'id_imagen' => $Articulo->id_imagen,
-                    'codigo' => $Articulo->codigo,
-                    'id_usuario' => $Articulo->id_usuario
+                   'id' => $Articulo->id_articulo,
+                   'nombre' => $Articulo->nombre,
+                   'descripcion' => $Articulo->descripcion,
+                   'precio_unitario' => $Articulo->precio_unitario,
+                   'precio_venta' => $Articulo->precio_venta,
+                   'id_imagen' => $Articulo->id_imagen,
+                   'codigo' => $Articulo->codigo,
+                   'id_usuario' => $Articulo->id_usuario,
+                   'nombre' => $Articulo->imagen,
+                   'url' => $Articulo->url,
+                   'alt' => $Articulo->alt,
+                   'id_categoria' => $Articulo->id_categoria,
+                   'categoria' => $Articulo->categoria,
+                   'categoriapadre' => $Articulo->categoriapadre
                 ];
                 $Imagenarticulo = Imagenarticulo::where('id', $Articulo->id)->first();
                 if(!empty($Imagenarticulo)){
@@ -87,7 +129,22 @@ class InventarioController extends BaseController
     public function showArticulo($id){
         try
         {
-            $Articulo = Articulo::where('id', $id)->first();
+            $Articulos = Articulo::select(
+            'articulo.id as id_articulo',
+            'articulo.nombre as nombre',
+            'articulo.descripcion as descripcion',
+            'articulo.precio_unitario as precio_unitario',
+            'articulo.precio_venta as precio_venta',
+            'articulo.id_imagen as id_imagen',
+            'articulo.codigo as codigo',
+            'articulo.id_usuario as id_usuario',
+            'imagenarticulo.nombre as imagen',
+            'imagenarticulo.url as url',
+            'imagenarticulo.alt as alt',
+            'categorias.id_categoria as id_categoria',
+            'categorias.nombre as categoria',
+            'categorias.parent as categoriapadre'
+            )->join('inventario.imagenarticulo', 'imagenarticulo.id', '=', 'articulo.id_imagen')->join('comun.categorias', 'categorias.id', '=', 'articulo.id_categoria')->where('articulo.id', $id)->first();
         }
         catch (Exception $e)
         {
@@ -105,22 +162,21 @@ class InventarioController extends BaseController
         {
             $data = [];
             $data = [
-                'id' => $Articulo->id,
-                'nombre' => $Articulo->nombre,
-                'descripcion' => $Articulo->descripcion,
-                'precio_unitario' => $Articulo->precio_unitario,
-                'precio_venta' => $Articulo->precio_venta,
-                'id_imagen' => $Articulo->id_imagen,
-                'codigo' => $Articulo->codigo,
-                'id_usuario' => $Articulo->id_usuario
+                   'id' => $Articulo->id_articulo,
+                   'nombre' => $Articulo->nombre,
+                   'descripcion' => $Articulo->descripcion,
+                   'precio_unitario' => $Articulo->precio_unitario,
+                   'precio_venta' => $Articulo->precio_venta,
+                   'id_imagen' => $Articulo->id_imagen,
+                   'codigo' => $Articulo->codigo,
+                   'id_usuario' => $Articulo->id_usuario,
+                   'nombre' => $Articulo->imagen,
+                   'url' => $Articulo->url,
+                   'alt' => $Articulo->alt,
+                   'id_categoria' => $Articulo->id_categoria,
+                   'categoria' => $Articulo->categoria,
+                   'categoriapadre' => $Articulo->categoriapadre
             ];
-            $Imagenarticulo = Imagenarticulo::where('id', $id)->first();
-            if(!empty($Imagenarticulo)){
-                $data['url'] = $Imagenarticulo->url;
-            }
-            else {
-                $data['url'] = "";
-            }
             return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
         }
         else
@@ -2666,5 +2722,223 @@ class InventarioController extends BaseController
                 ]
             ], 404);
         }
-    }           
+    }
+    public function indexCategoria(){
+        try
+        {
+            $Categorias = Categoria::all();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Categorias'
+                ]
+            ], 500);
+        }
+        if($Categorias)
+        {
+            $data = [];
+            foreach($Categorias as $Categoria)
+            {
+                $types = [];
+                $types = [
+                    'id' => $Categoria->id,
+                    'parent' => $Categoria->parent,
+                    'nombre' => $Categoria->nombre
+                ];
+                $data[] = $types;
+            }
+            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Categorias was not found'
+                ]
+            ], 404);
+        }
+    }
+    public function showCategoria($id){
+        try
+        {
+            $Categoria = Categoria::where('id', $id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Categorias'
+                ]
+            ], 500);
+        }
+        if($Categoria)
+        {
+            $data = [];
+            $data = [
+                'id' => $Categoria->id,
+                'parent' => $Categoria->parent,
+                'nombre' => $Categoria->nombre
+            ];
+            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
+        }
+        else
+        {
+            return response()->json([
+                'responseCode' => 404,
+                'response' => 'Not Found',
+                'data' => [
+                    'errorCode' => 'Error-2',    
+                    'errorMessage' => 'Categoria was not found'
+                ]
+            ], 404);
+        }
+    }
+    public function storeCategoria(Request $request){
+        $data = new Categoria();
+
+        if($request->input('nombre')){
+            $data->nombre = $request->input('nombre');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('parent')){
+            if(is_int($request->input('parent'))){
+                $data->parent=$request->input('parent');
+            }
+            else{
+                return response()->json(['responseCode' => '422','response' => 'Validation Error','data' => ['errorCode' => '001','error' => 'parent debe ser numero entero']],422);
+            }
+        } else {
+            return response()->json(['responseCode' => '422', 'response' => 'Validation Error', 'data' => ['errorCode' => '002', 'error' => 'parent no puede estar vacio']],422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error storing Categorias'
+                ]
+            ], 500);
+        }
+    }
+    public function updateCategoria($id, Request $request){
+        try
+        {
+            $data = Categoria::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Categorias'
+                ]
+            ], 500);
+        }
+        if($request->input('nombre')){
+            $data->nombre = $request->input('nombre');
+        }else{
+            return response()->json([
+                'responseCode' => '422',
+                'response' => 'Validation Error',
+                'data' => [
+                    'errorCode' => '001',
+                    'error' => 'Nombre no puede estar vacio'
+                ]
+            ], 422);
+        }
+        if($request->input('parent')){
+            if(is_int($request->input('parent'))){
+                $data->parent=$request->input('parent');
+            }
+            else{
+                return response()->json(['responseCode' => '422','response' => 'Validation Error','data' => ['errorCode' => '001','error' => 'parent debe ser numero entero']],422);
+            }
+        } else {
+            return response()->json(['responseCode' => '422', 'response' => 'Validation Error', 'data' => ['errorCode' => '002', 'error' => 'parent no puede estar vacio']],422);
+        }
+        try 
+        {
+            $data->save();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error updating Categorias'
+                ]
+            ], 500);
+        }
+    }
+    public function destroyCategoria($id){
+        try
+        {
+            $data = Categoria::where('id',$id)->first();
+        }
+        catch (Exception $e)
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error getting Categoria'
+                ]
+            ], 500);
+        }
+        try 
+        {
+            $data->delete();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
+        } 
+        catch (Exception $e) 
+        {
+            return response()->json([
+                'responseCode' => '500',
+                'response' => 'Internal Server Error',
+                'data' => [
+                    'errorCode' => 'Error-1',
+                    //"exception" => $e->getMessage(),
+                    'errorMessage' => 'Error deleting Categoria'
+                ]
+            ], 500);
+        }
+    }
 }

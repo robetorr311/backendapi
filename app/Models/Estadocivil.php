@@ -9,7 +9,7 @@ class Estadocivil extends Model
 {
     // use HasFactory;
 
-    public $table = "comun.profesion";
+    public $table = "comun.estadocivil";
     protected $fillable = ['nombre'];
             
 }

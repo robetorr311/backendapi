@@ -24,6 +24,8 @@ use App\Models\Alimento;
 use App\Models\Pais;
 use App\Models\Laboratorio;
 use App\Models\Configuracion;
+use App\Models\Profesion;
+use App\Models\Estadocivil;
 use App\Models\User;
 class ConsultorioController extends BaseController
 {
@@ -138,8 +140,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeServicio(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Servicio();
-
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
         }else{
@@ -171,6 +175,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateServicio($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Servicio::where('id',$id)->first();
@@ -334,6 +341,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeTipodocumento(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Tipodocumento();
 
         if($request->input('nombre')){
@@ -367,6 +377,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateTipodocumento($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Tipodocumento::where('id',$id)->first();
@@ -444,398 +457,6 @@ class ConsultorioController extends BaseController
                     'errorCode' => 'Error-1',
                     //"exception" => $e->getMessage(),
                     'errorMessage' => 'Error deleting Tipodocumento'
-                ]
-            ], 500);
-        }
-    }
-    public function indexProfesion(){
-        try
-        {
-            $Profesions = Profesion::all();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Profesions'
-                ]
-            ], 500);
-        }
-        if($Profesions)
-        {
-            $data = [];
-            foreach($Profesions as $Profesion)
-            {
-                $types = [];
-                $types = [
-                    'id' => $Profesion->id,
-                    'nombre' => $Profesion->nombre
-                ];
-                $data[] = $types;
-            }
-            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
-        }
-        else
-        {
-            return response()->json([
-                'responseCode' => 404,
-                'response' => 'Not Found',
-                'data' => [
-                    'errorCode' => 'Error-2',    
-                    'errorMessage' => 'Profesions was not found'
-                ]
-            ], 404);
-        }
-    }
-    public function showProfesion($id){
-        try
-        {
-            $Profesion = Profesion::where('id', $id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Profesions'
-                ]
-            ], 500);
-        }
-        if($Profesion)
-        {
-            $data = [];
-            $data = [
-                'id' => $Profesion->id,
-                'nombre' => $Profesion->nombre
-            ];
-            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
-        }
-        else
-        {
-            return response()->json([
-                'responseCode' => 404,
-                'response' => 'Not Found',
-                'data' => [
-                    'errorCode' => 'Error-2',    
-                    'errorMessage' => 'Profesion was not found'
-                ]
-            ], 404);
-        }
-    }
-    public function storeProfesion(Request $request){
-        $data = new Profesion();
-
-        if($request->input('nombre')){
-            $data->nombre = $request->input('nombre');
-        }else{
-            return response()->json([
-                'responseCode' => '422',
-                'response' => 'Validation Error',
-                'data' => [
-                    'errorCode' => '001',
-                    'error' => 'Nombre no puede estar vacio'
-                ]
-            ], 422);
-        }
-        try 
-        {
-            $data->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error storing Profesions'
-                ]
-            ], 500);
-        }
-    }
-    public function updateProfesion($id, Request $request){
-        try
-        {
-            $data = Profesion::where('id',$id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Profesions'
-                ]
-            ], 500);
-        }
-        if($request->input('nombre')){
-            $data->nombre = $request->input('nombre');
-        }else{
-            return response()->json([
-                'responseCode' => '422',
-                'response' => 'Validation Error',
-                'data' => [
-                    'errorCode' => '001',
-                    'error' => 'Nombre no puede estar vacio'
-                ]
-            ], 422);
-        }
-        try 
-        {
-            $data->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error updating Profesions'
-                ]
-            ], 500);
-        }
-    }
-    public function destroyProfesion($id){
-        try
-        {
-            $data = Profesion::where('id',$id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Profesion'
-                ]
-            ], 500);
-        }
-        try 
-        {
-            $data->delete();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error deleting Profesion'
-                ]
-            ], 500);
-        }
-    }
-    public function indexEstadocivil(){
-        try
-        {
-            $Estadocivils = Estadocivil::all();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Estadocivils'
-                ]
-            ], 500);
-        }
-        if($Estadocivils)
-        {
-            $data = [];
-            foreach($Estadocivils as $Estadocivil)
-            {
-                $types = [];
-                $types = [
-                    'id' => $Estadocivil->id,
-                    'nombre' => $Estadocivil->nombre
-                ];
-                $data[] = $types;
-            }
-            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
-        }
-        else
-        {
-            return response()->json([
-                'responseCode' => 404,
-                'response' => 'Not Found',
-                'data' => [
-                    'errorCode' => 'Error-2',    
-                    'errorMessage' => 'Estadocivils was not found'
-                ]
-            ], 404);
-        }
-    }
-    public function showEstadocivil($id){
-        try
-        {
-            $Estadocivil = Estadocivil::where('id', $id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Estadocivils'
-                ]
-            ], 500);
-        }
-        if($Estadocivil)
-        {
-            $data = [];
-            $data = [
-                'id' => $Estadocivil->id,
-                'nombre' => $Estadocivil->nombre
-            ];
-            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
-        }
-        else
-        {
-            return response()->json([
-                'responseCode' => 404,
-                'response' => 'Not Found',
-                'data' => [
-                    'errorCode' => 'Error-2',    
-                    'errorMessage' => 'Estadocivil was not found'
-                ]
-            ], 404);
-        }
-    }
-    public function storeEstadocivil(Request $request){
-        $data = new Estadocivil();
-
-        if($request->input('nombre')){
-            $data->nombre = $request->input('nombre');
-        }else{
-            return response()->json([
-                'responseCode' => '422',
-                'response' => 'Validation Error',
-                'data' => [
-                    'errorCode' => '001',
-                    'error' => 'Nombre no puede estar vacio'
-                ]
-            ], 422);
-        }
-        try 
-        {
-            $data->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error storing Estadocivils'
-                ]
-            ], 500);
-        }
-    }
-    public function updateEstadocivil($id, Request $request){
-        try
-        {
-            $data = Estadocivil::where('id',$id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Estadocivils'
-                ]
-            ], 500);
-        }
-        if($request->input('nombre')){
-            $data->nombre = $request->input('nombre');
-        }else{
-            return response()->json([
-                'responseCode' => '422',
-                'response' => 'Validation Error',
-                'data' => [
-                    'errorCode' => '001',
-                    'error' => 'Nombre no puede estar vacio'
-                ]
-            ], 422);
-        }
-        try 
-        {
-            $data->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error updating Estadocivils'
-                ]
-            ], 500);
-        }
-    }
-    public function destroyEstadocivil($id){
-        try
-        {
-            $data = Estadocivil::where('id',$id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Estadocivil'
-                ]
-            ], 500);
-        }
-        try 
-        {
-            $data->delete();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error deleting Estadocivil'
                 ]
             ], 500);
         }
@@ -956,8 +577,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storePaciente(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Paciente();
-
         if($request->input('cedula')){
             $data->cedula = $request->input('cedula');
         } else {
@@ -1127,6 +750,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updatePaciente($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Paciente::where('id',$id)->first();
@@ -1427,6 +1053,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeMedico(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Medico();
 
         if($request->input('cedula')){
@@ -1545,6 +1174,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateMedico($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Medico::where('id',$id)->first();
@@ -1755,8 +1387,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeElectrocardiograma(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Electrocardiograma();
-
         if($request->input('nombrearchivo')){
             $data->nombrearchivo = $request->input('nombrearchivo');
         } else {
@@ -1800,6 +1434,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateElectrocardiograma($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Electrocardiograma::where('id',$id)->first();
@@ -1945,8 +1582,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeDocumento(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Documento();
-
         if($request->input('numero')){
             $data->numero = $request->input('numero');
         } else {
@@ -2034,6 +1673,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateDocumento($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Documento::where('id',$id)->first();
@@ -2239,8 +1881,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeExamenfisico(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Examenfisico();
-
         if($request->input('id_paciente')){
             if(is_int($request->input('id_paciente'))){
                 $data->id_paciente=$request->input('id_paciente');
@@ -2364,6 +2008,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateExamenfisico($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Examenfisico::where('id',$id)->first();
@@ -2581,8 +2228,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeServiciosmedico(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Serviciosmedico();
-
         if($request->input('id_medico')){
             if(is_int($request->input('id_medico'))){
                 $data->id_medico=$request->input('id_medico');
@@ -2638,6 +2287,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateServiciosmedico($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Serviciosmedico::where('id',$id)->first();
@@ -2789,8 +2441,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeHorario(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Horario();
-
         if($request->input('descripcion')){
             $data->descripcion = $request->input('descripcion');
         } else {
@@ -2839,6 +2493,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateHorario($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Horario::where('id',$id)->first();
@@ -2975,8 +2632,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeTurno(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Turno();
-
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
         }else{
@@ -3000,6 +2659,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateTurno($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Turno::where('id',$id)->first();
@@ -3114,8 +2776,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeCita(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Cita();
-
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
                 $data->id_documento=$request->input('id_documento');
@@ -3199,6 +2863,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateCita($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Cita::where('id',$id)->first();
@@ -3386,8 +3053,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeMorbilidad(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Morbilidad();
-
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
                 $data->id_documento=$request->input('id_documento');
@@ -3460,6 +3129,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateMorbilidad($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Morbilidad::where('id',$id)->first();
@@ -3636,8 +3308,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeMedicinainterna(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Medicinainterna();
-
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
                 $data->id_documento=$request->input('id_documento');
@@ -3710,6 +3384,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateMedicinainterna($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Medicinainterna::where('id',$id)->first();
@@ -3935,8 +3612,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storePacienteinfantil(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Pacienteinfantil();
-
         if($request->input('cedula')){
             $data->cedula = $request->input('cedula');
         } else {
@@ -4095,6 +3774,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updatePacienteinfantil($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Pacienteinfantil::where('id',$id)->first();
@@ -4399,8 +4081,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeTerapiarespiratoria(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Terapiarespiratoria();
-
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
                 $data->id_documento=$request->input('id_documento');
@@ -4482,6 +4166,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateTerapiarespiratoria($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Terapiarespiratoria::where('id',$id)->first();
@@ -4659,8 +4346,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeHerencia(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Herencia();
-
         if($request->input('id_paciente')){
             if(is_int($request->input('id_paciente'))){
                 $data->id_paciente=$request->input('id_paciente');
@@ -4695,6 +4384,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateHerencia($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Herencia::where('id',$id)->first();
@@ -4857,8 +4549,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeAntecedentes(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Antecedentes();
-
         if($request->input('diabetes')){
             if(is_int($request->input('diabetes'))){
                 $data->diabetes=$request->input('diabetes');
@@ -5055,6 +4749,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateAntecedentes($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Antecedentes::where('id',$id)->first();
@@ -5535,8 +5232,10 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeLaboratorio(Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         $data = new Laboratorio();
-
         if($request->input('fecha')){
             $data->fecha = $request->input('nombre');
         }
@@ -5851,6 +5550,9 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateLaboratorio($id, Request $request){
+        if($this->token != $request->input('token')){
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        }
         try
         {
             $data = Laboratorio::where('id',$id)->first();
@@ -6200,134 +5902,4 @@ class ConsultorioController extends BaseController
             return response()->json(['responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error deleting Laboratorio']], 500);
         }
     }
-    public function indexAlimento(){
-        try
-        {
-            $Alimentos = Alimento::all();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error getting Alimentos']], 500);
-        }
-        if($Alimentos)
-        {
-            $data = [];
-            foreach($Alimentos as $Alimento)
-            {
-                $types = [];
-                $types = [
-                    'id' => $Alimento->id,
-                    'nombre' => $Alimento->nombre
-                ];
-                $data[] = $types;
-            }
-            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
-        }
-        else
-        {
-            return response()->json(['responseCode' => 404,'response' => 'Not Found','data' => ['errorCode' => 'Error-2','errorMessage' => 'Alimentos was not found']], 404);
-        }
-    }
-    public function showAlimento($id){
-        try
-        {
-            $Alimento = Alimento::where('id', $id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json(['responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error getting Alimentos']], 500);
-        }
-        if($Alimento)
-        {
-            $data = [];
-            $data = [
-                'id' => $Alimento->id,
-                'nombre' => $Alimento->nombre
-            ];
-            return response()->json(['responseCode' => 200,'response' => 'OK','data' => $data], 200);
-        }
-        else
-        {
-            return response()->json(['responseCode' => 404,'response' => 'Not Found','data' => ['errorCode' => 'Error-2','errorMessage' => 'Alimento was not found']], 404);
-        }
-    }
-    public function storeAlimento(Request $request){
-        $data = new Alimento();
-
-        if($request->input('nombre')){
-            $data->nombre = $request->input('nombre');
-        }else{
-            return response()->json([
-                'responseCode' => '422',
-                'response' => 'Validation Error',
-                'data' => [
-                    'errorCode' => '001',
-                    'error' => 'Nombre no puede estar vacio'
-                ]
-            ], 422);
-        }
-        try 
-        {
-            $data->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json(['responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error storing Alimentos']], 500);
-        }
-    }
-    public function updateAlimento($id, Request $request){
-        try
-        {
-            $data = Alimento::where('id',$id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Alimentos'
-                ]
-            ], 500);
-        }
-        if($request->input('nombre')){
-            $data->nombre = $request->input('nombre');
-        }else{
-            return response()->json(['responseCode' => '422', 'response' => 'Validation Error','data' => ['errorCode' => '001','error' => 'Nombre no puede estar vacio']], 422);
-        }
-        try 
-        {
-            $data->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json(['responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error updating Alimentos']], 500);
-        }
-    }
-    public function destroyAlimento($id){
-        try
-        {
-            $data = Alimento::where('id',$id)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error getting Alimento']], 500);
-        }
-        try 
-        {
-            $data->delete();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200); 
-        } 
-        catch (Exception $e) 
-        {
-            return response()->json(['responseCode' => '500','response' => 'Internal Server Error','data' => ['errorCode' => 'Error-1','errorMessage' => 'Error deleting Alimento']], 500);
-        }
-    }    
-
 }

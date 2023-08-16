@@ -24,7 +24,6 @@ use App\Models\Menu;
 use App\Models\User;
 class ComunController extends BaseController
 {
-    private $token;
     /**
      * Create a new controller instance.
      *
@@ -32,25 +31,7 @@ class ComunController extends BaseController
      */
     public function __construct()
     {
-        try
-        {
-            $configuracion = Configuracion::where('variable', 'token')->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Configuracion'
-                ]
-            ], 500);
-        }
-        if(!empty($configuracion)){
-            $this->token=$configuracion->valor;
-        }
+        $this->middleware('auth:api');
     }
     public function indexUsuario(){
         try
@@ -160,9 +141,6 @@ class ComunController extends BaseController
         }
     }
     public function storeUsuario(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new User();
         if($request->input('nombre')){ 
             $data->nombre = $request->input('nombre');
@@ -190,8 +168,8 @@ class ComunController extends BaseController
                 ]
             ], 422);
         }
-        if($request->input('clave')){ 
-            $data->clave= Hash::make($request->input('clave'));
+        if($request->input('password')){ 
+            $data->password= Hash::make($request->input('password'));
         }
         else{
             return response()->json([
@@ -261,9 +239,6 @@ class ComunController extends BaseController
         }
     }
     public function updateUsuario($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = User::where('id',$id)->first();
@@ -497,9 +472,6 @@ class ComunController extends BaseController
         }
     }
     public function storeEstado(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Estado();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -533,9 +505,6 @@ class ComunController extends BaseController
         }
     }
     public function updateEstado($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Estado::where('id',$id)->first();
@@ -719,9 +688,6 @@ class ComunController extends BaseController
         }
     }
     public function storeMunicipio(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Municipio();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -766,9 +732,6 @@ class ComunController extends BaseController
         }
     }
     public function updateMunicipio($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Municipio::where('id',$id)->first();
@@ -966,9 +929,6 @@ class ComunController extends BaseController
         }
     }
     public function storeParroquia(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Parroquia();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -1025,9 +985,6 @@ class ComunController extends BaseController
         }
     }
     public function updateParroquia($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Parroquia::where('id',$id)->first();
@@ -1239,9 +1196,6 @@ class ComunController extends BaseController
         }
     }
     public function storeLocalidad(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Localidad();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -1310,9 +1264,6 @@ class ComunController extends BaseController
         }
     }
     public function updateLocalidad($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Localidad::where('id',$id)->first();
@@ -1513,9 +1464,6 @@ class ComunController extends BaseController
         }
     }
     public function storeSistema(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Sistema();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -1549,9 +1497,6 @@ class ComunController extends BaseController
         }
     }
     public function updateSistema($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Sistema::where('id',$id)->first();
@@ -1719,9 +1664,6 @@ class ComunController extends BaseController
         }
     }
     public function storeEstatus(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Estatus();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -1766,9 +1708,6 @@ class ComunController extends BaseController
         }
     }
     public function updateEstatus($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Estatus::where('id',$id)->first();
@@ -2031,9 +1970,6 @@ class ComunController extends BaseController
         }
     }
     public function storePerfil(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Perfil();
         if($request->input('id_usuario')){ 
             $data->id_usuario = $request->input('id_usuario');
@@ -2167,9 +2103,6 @@ class ComunController extends BaseController
         }
     }
     public function updatePerfil($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Perfil::where('id',$id)->first();
@@ -2438,9 +2371,6 @@ class ComunController extends BaseController
         }
     }
     public function storeTipoEstatus(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new TipoEstatus();
 
         if($request->input('nombre')){
@@ -2474,9 +2404,6 @@ class ComunController extends BaseController
         }
     }
     public function updateTipoEstatus($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Tipoestatus::where('id',$id)->first();
@@ -2662,9 +2589,6 @@ class ComunController extends BaseController
         }
     }
     public function storeMenu(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Menu();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -2721,9 +2645,6 @@ class ComunController extends BaseController
         }
     }
     public function updateMenu($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Menu::where('id',$id)->first();
@@ -2933,9 +2854,6 @@ class ComunController extends BaseController
         }
     }
     public function storePermisos(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Permiso();
         if($request->input('id_menu')){
             $data->id_menu = $request->input('id_menu');
@@ -2992,9 +2910,6 @@ class ComunController extends BaseController
         }
     }
     public function updatePermisos($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Permiso::where('id',$id)->first();
@@ -3154,9 +3069,6 @@ class ComunController extends BaseController
         }
     }
     public function storeAlimento(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Alimento();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -3181,9 +3093,6 @@ class ComunController extends BaseController
         }
     }
     public function updateAlimento($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Alimento::where('id',$id)->first();
@@ -3319,9 +3228,6 @@ class ComunController extends BaseController
         }
     }
     public function storeCategoria(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Categoria();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -3364,9 +3270,6 @@ class ComunController extends BaseController
         }
     }
     public function updateCategoria($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Categoria::where('id',$id)->first();
@@ -3540,9 +3443,6 @@ class ComunController extends BaseController
         }
     }
     public function storeProfesion(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Profesion();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -3575,9 +3475,6 @@ class ComunController extends BaseController
         }
     }
     public function updateProfesion($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Profesion::where('id',$id)->first();
@@ -3741,9 +3638,6 @@ class ComunController extends BaseController
         }
     }
     public function storeEstadocivil(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Estadocivil();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -3776,9 +3670,6 @@ class ComunController extends BaseController
         }
     }
     public function updateEstadocivil($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Estadocivil::where('id',$id)->first();
@@ -3965,9 +3856,6 @@ class ComunController extends BaseController
         }
     }
     public function storeContacto(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Contacto();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -4036,9 +3924,6 @@ class ComunController extends BaseController
         }
     }
     public function updateContacto($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Contacto::where('id',$id)->first();
@@ -4261,9 +4146,6 @@ class ComunController extends BaseController
         }
     }
     public function storeOpinion(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Opinion();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -4332,9 +4214,6 @@ class ComunController extends BaseController
         }
     }
     public function updateOpinion($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Opinion::where('id',$id)->first();
@@ -4553,9 +4432,6 @@ class ComunController extends BaseController
         }
     }
     public function storeConfiguracion(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         $data = new Configuracion();
         if($request->input('variable')){
             $data->variable = $request->input('variable');
@@ -4600,9 +4476,6 @@ class ComunController extends BaseController
         }
     }
     public function updateConfiguracion($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         try
         {
             $data = Configuracion::where('id',$id)->first();
@@ -4698,9 +4571,6 @@ class ComunController extends BaseController
         }
     }
     public function login(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
         if($request->input('email')){
             $email = $request->input('email');
         }else{
@@ -4725,53 +4595,17 @@ class ComunController extends BaseController
                 ]
             ], 422);
         }
+        $credentials = [
+            'email' => $email,
+            'password' => $password
+         ];
 
-        try
-        {
-            $usuario = User::where('email', $email)->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Users'
-                ]
-            ], 500);
-        }
-        if(!empty($usuario))
-        {
-            if (Hash::check($password, $usuario->clave)) {
-                $data = [];
-                $data = [
-                    'id' => $usuario->id,
-                    'nombre' => $usuario->nombre,
-                    'login' => $usuario->login,
-                    'email' => $usuario->email,
-                    'telefono' => $usuario->telefono,
-                    'estatus' => $usuario->estatus,
-                    'email_verified' => $usuario->email_verified,
-                    'telefono_verified' => $usuario->telefono_verified
-                ];
-                return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $data], 200);
-            }
-            else {
-                return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-            }
-        }
-        else
-        {
-            return response()->json([
-                'responseCode' => 404,
-                'response' => 'Not Found',
-                'data' => [
-                    'errorCode' => 'Error-2',    
-                    'errorMessage' => 'Usuario was not found'
-                ]
-            ], 404);
+        $authRes = Auth::attempt($credentials);
+        if ($authRes) {
+            $user = Auth::user();
+            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $authRes], 200);
+        } else {
+            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
         }
     }
 }

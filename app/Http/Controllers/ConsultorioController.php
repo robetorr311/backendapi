@@ -29,7 +29,6 @@ use App\Models\Estadocivil;
 use App\Models\User;
 class ConsultorioController extends BaseController
 {
-    private $token;
     /**
      * Create a new controller instance.
      *
@@ -37,25 +36,7 @@ class ConsultorioController extends BaseController
      */
     public function __construct()
     {
-        try
-        {
-            $configuracion = Configuracion::where('variable', 'token')->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Configuracion'
-                ]
-            ], 500);
-        }
-        if(!empty($configuracion)){
-            $this->token=$configuracion->valor;
-        }
+        $this->middleware('auth:api');
     }
 
     public function indexServicio(){
@@ -140,9 +121,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeServicio(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Servicio();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -175,9 +154,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateServicio($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Servicio::where('id',$id)->first();
@@ -341,9 +318,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeTipodocumento(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Tipodocumento();
 
         if($request->input('nombre')){
@@ -377,9 +352,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateTipodocumento($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Tipodocumento::where('id',$id)->first();
@@ -577,9 +550,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storePaciente(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Paciente();
         if($request->input('cedula')){
             $data->cedula = $request->input('cedula');
@@ -750,9 +721,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updatePaciente($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Paciente::where('id',$id)->first();
@@ -1053,9 +1022,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeMedico(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Medico();
 
         if($request->input('cedula')){
@@ -1174,9 +1141,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateMedico($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Medico::where('id',$id)->first();
@@ -1387,9 +1352,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeElectrocardiograma(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Electrocardiograma();
         if($request->input('nombrearchivo')){
             $data->nombrearchivo = $request->input('nombrearchivo');
@@ -1434,9 +1397,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateElectrocardiograma($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Electrocardiograma::where('id',$id)->first();
@@ -1582,9 +1543,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeDocumento(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Documento();
         if($request->input('numero')){
             $data->numero = $request->input('numero');
@@ -1673,9 +1632,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateDocumento($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Documento::where('id',$id)->first();
@@ -1881,9 +1838,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeExamenfisico(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Examenfisico();
         if($request->input('id_paciente')){
             if(is_int($request->input('id_paciente'))){
@@ -2008,9 +1963,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateExamenfisico($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Examenfisico::where('id',$id)->first();
@@ -2228,9 +2181,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeServiciosmedico(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Serviciosmedico();
         if($request->input('id_medico')){
             if(is_int($request->input('id_medico'))){
@@ -2287,9 +2238,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateServiciosmedico($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Serviciosmedico::where('id',$id)->first();
@@ -2441,9 +2390,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeHorario(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Horario();
         if($request->input('descripcion')){
             $data->descripcion = $request->input('descripcion');
@@ -2493,9 +2440,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateHorario($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Horario::where('id',$id)->first();
@@ -2632,9 +2577,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeTurno(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Turno();
         if($request->input('nombre')){
             $data->nombre = $request->input('nombre');
@@ -2659,9 +2602,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateTurno($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Turno::where('id',$id)->first();
@@ -2776,9 +2717,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeCita(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Cita();
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
@@ -2863,9 +2802,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateCita($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Cita::where('id',$id)->first();
@@ -3053,9 +2990,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeMorbilidad(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Morbilidad();
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
@@ -3129,9 +3064,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateMorbilidad($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Morbilidad::where('id',$id)->first();
@@ -3308,9 +3241,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeMedicinainterna(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Medicinainterna();
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
@@ -3384,9 +3315,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateMedicinainterna($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Medicinainterna::where('id',$id)->first();
@@ -3612,9 +3541,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storePacienteinfantil(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Pacienteinfantil();
         if($request->input('cedula')){
             $data->cedula = $request->input('cedula');
@@ -3774,9 +3701,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updatePacienteinfantil($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Pacienteinfantil::where('id',$id)->first();
@@ -4081,9 +4006,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeTerapiarespiratoria(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Terapiarespiratoria();
         if($request->input('id_documento')){
             if(is_int($request->input('id_documento'))){
@@ -4166,9 +4089,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateTerapiarespiratoria($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Terapiarespiratoria::where('id',$id)->first();
@@ -4346,9 +4267,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeHerencia(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Herencia();
         if($request->input('id_paciente')){
             if(is_int($request->input('id_paciente'))){
@@ -4384,9 +4303,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateHerencia($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Herencia::where('id',$id)->first();
@@ -4549,9 +4466,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeAntecedentes(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Antecedentes();
         if($request->input('diabetes')){
             if(is_int($request->input('diabetes'))){
@@ -4749,9 +4664,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateAntecedentes($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Antecedentes::where('id',$id)->first();
@@ -5232,9 +5145,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function storeLaboratorio(Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         $data = new Laboratorio();
         if($request->input('fecha')){
             $data->fecha = $request->input('nombre');
@@ -5550,9 +5461,7 @@ class ConsultorioController extends BaseController
         }
     }
     public function updateLaboratorio($id, Request $request){
-        if($this->token != $request->input('token')){
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
-        }
+        
         try
         {
             $data = Laboratorio::where('id',$id)->first();

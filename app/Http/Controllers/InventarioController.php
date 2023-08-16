@@ -17,7 +17,6 @@ use App\Models\Configuracion;
 use App\Models\User;
 class InventarioController extends BaseController
 {
-    private $token;
     /**
      * Create a new controller instance.
      *
@@ -25,25 +24,7 @@ class InventarioController extends BaseController
      */
     public function __construct()
     {
-        try
-        {
-            $configuracion = Configuracion::where('variable', 'token')->first();
-        }
-        catch (Exception $e)
-        {
-            return response()->json([
-                'responseCode' => '500',
-                'response' => 'Internal Server Error',
-                'data' => [
-                    'errorCode' => 'Error-1',
-                    //"exception" => $e->getMessage(),
-                    'errorMessage' => 'Error getting Configuracion'
-                ]
-            ], 500);
-        }
-        if(!empty($configuracion)){
-            $this->token=$configuracion->valor;
-        }
+        $this->middleware('auth:api');
     }
     public function indexArticulo(){
         try

@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as Auth;
-
+use App\Models\User;
 class Authenticate
 {
     /**
@@ -36,9 +36,19 @@ class Authenticate
     public function handle($request, Closure $next, $guard = null)
     {
         if ($this->auth->guard($guard)->guest()) {
-            return response('Unauthorized.', 401);
+            if ($request->header('Authorization')) {
+                $key = explode(' ',$request->header('Authorization'));
+                $user = User::where('token', $key[1])->first();
+                if(!empty($user)){
+                    return $next($request);
+                }
+                else{
+                    return response('Unauthorized...', 401);
+                }
+            }
+            else{
+                return response('Unauthorized...', 401);
+            }
         }
-
-        return $next($request);
     }
 }

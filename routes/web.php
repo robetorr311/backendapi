@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\LumenAuthController;
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -16,7 +16,13 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
 $router->group(['prefix' => 'api'], function () use ($router) {
+
+  $router->post('login', ['uses' => 'LumenAuthController@login']);
+  $router->post('logout', ['uses' => 'LumenAuthController@logout']);
+  $router->post('refresh', ['uses' => 'LumenAuthController@refresh']);
+  $router->post('me', ['uses' => 'LumenAuthController@me']);    
   $router->get('usuario/all', ['uses' => 'ComunController@indexUsuario']);
   $router->get('usuario/{id}', ['uses' => 'ComunController@showUsuario']);
   $router->post('usuario', ['uses' => 'ComunController@storeUsuario']);
@@ -130,8 +136,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->post('configuracion', ['uses' => 'ComunController@storeConfiguracion']);
   $router->put('configuracion/{id}', ['uses' => 'ComunController@updateConfiguracion']);
   $router->delete('configuracion/{id}', ['uses' => 'ComunController@destroyConfiguracion']);
-
-  $router->post('login', ['uses' => 'ComunController@login']);
 
   $router->get('orden/all', ['uses' => 'VentasController@indexOrden']);
   $router->get('orden/{id}', ['uses' => 'VentasController@showOrden']);

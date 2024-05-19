@@ -48,9 +48,9 @@ class LumenAuthController extends Controller
             'password' => $password
          ];
 
-        if (! $token = Auth::attempt($credentials)) {
+        /*if (! $token = Auth::attempt($credentials)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
-        }
+        }*/
 
         return $this->jsonResponse($token);
     }

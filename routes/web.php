@@ -136,7 +136,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
   $router->post('configuracion', ['uses' => 'ComunController@storeConfiguracion']);
   $router->put('configuracion/{id}', ['uses' => 'ComunController@updateConfiguracion']);
   $router->delete('configuracion/{id}', ['uses' => 'ComunController@destroyConfiguracion']);
-
+  $router->get('paladar_conf/{id}', ['uses' => 'DulcepaladarController@showConfiguracion']);
   $router->get('orden/all', ['uses' => 'VentasController@indexOrden']);
   $router->get('orden/{id}', ['uses' => 'VentasController@showOrden']);
   $router->post('orden', ['uses' => 'VentasController@storeOrden']);

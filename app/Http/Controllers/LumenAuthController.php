@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+
 class LumenAuthController extends Controller
 {
     public function __construct()
@@ -48,16 +48,11 @@ class LumenAuthController extends Controller
             'password' => $password
          ];
 
-        if (!$token = Auth::attempt($credentials)) {
-            return response()->json(['responseCode' => '401','response' => 'Unauthorized'], 401);
+        if (! $token = Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
-        else{
-            $user = Auth::user();
-            $usr = User::where('id', $$user->id)->first();
-            $usr->token=$token;
-            $usr->save();
-            return response()->json(['responseCode' => 200, 'response' => 'OK', 'data' => $this->jsonResponse($token)], 200);
-        }
+
+        return $this->jsonResponse($token);
     }
 
      /**
